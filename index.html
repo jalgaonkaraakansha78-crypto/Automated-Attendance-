@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>रूरल स्कूल अटेंडेंस | Rural School Attendance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166d67;
+            --accent: #ff6b6b;
+            --light: #f8f9fa;
+            --dark: #2d3e50;
+            --success: #28a745;
+            --warning: #ffc107;
+            --text: #333;
+            --text-light: #6c757d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e6f7ff, #c3e6cb);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .school-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .date-display {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.4);
+            font-weight: bold;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .attendance-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+        }
+        
+        /* Big Buttons */
+        .big-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .big-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 120px;
+        }
+        
+        .big-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .big-btn i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Class selection */
+        .class-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .class-btn {
+            padding: 15px 5px;
+            background: var(--light);
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+        
+        .class-btn.active {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        /* Attendance list */
+        .student-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .student-item {
+            display: flex;
+            align-items: center;
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        .student-info {
+            flex-grow: 1;
+        }
+        
+        .student-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .student-id {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .attendance-toggle {
+            background: #ddd;
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .toggle-thumb {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .attendance-toggle.present {
+            background: var(--success);
+        }
+        
+        .attendance-toggle.present .toggle-thumb {
+            left: 32px;
+        }
+        
+        /* Action buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .submit-btn {
+            background: var(--success);
+        }
+        
+        .report-btn {
+            background: var(--primary);
+        }
+        
+        .help-btn {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        .sync-btn {
+            background: var(--secondary);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+        
+        /* Help section */
+        .help-section {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .help-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .help-item {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .help-item i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .big-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .class-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .class-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .big-btn {
+                min-height: 100px;
+                padding: 15px;
+            }
+            
+            .big-btn i {
+                font-size: 2rem;
+            }
+        }
+        
+        /* Animation for voice guide */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .voice-playing {
+            animation: pulse 1s infinite;
+            box-shadow: 0 0 15px var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="language-selector">
+                <button class="lang-btn active">English</button>
+                <button class="lang-btn">हिंदी</button>
+                <button class="lang-btn">मराठी</button>
+            </div>
+            <div class="school-name">  Attendance System</div>
+            <div class="date-display">Monday, September 16, 2023</div>
+        </header>
+        
+        <div class="main-content">
+            <div class="attendance-section">
+                <h2 class="section-title">Mark Attendance</h2>
+                
+                <div class="big-buttons">
+                    <div class="big-btn" id="qr-btn">
+                        <i class="fas fa-qrcode"></i>
+                        Scan QR Code
+                    </div>
+                    <div class="big-btn" id="face-btn">
+                        <i class="fas fa-camera"></i>
+                        Facial Recognition
+                    </div>
+                </div>
+                
+                <h3 class="section-title">Select Class</h3>
+                
+                <div class="class-selector">
+                    <div class="class-btn active">Class 1</div>
+                    <div class="class-btn">Class 2</div>
+                    <div class="class-btn">Class 3</div>
+                    <div class="class-btn">Class 4</div>
+                    <div class="class-btn">Class 5</div>
+                    <div class="class-btn">Class 6</div>
+                </div>
+                
+                <h3 class="section-title">Student List</h3>
+                
+                <div class="student-list">
+                    <div class="student-item">
+                        <div class="student-info">
+                            <div class="student-name">Rajesh Kumar</div>
+                            <div class="student-id">ID: ST001</div>
+                        </div>
+                        <div class="attendance-toggle present">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="student-item">
+                        <div class="student-info">
+                            <div class="student-name">Priya Sharma</div>
+                            <div class="student-id">ID: ST002</div>
+                        </div>
+                        <div class="attendance-toggle">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="student-item">
+                        <div class="student-info">
+                            <div class="student-name">Amit Singh</div>
+                            <div class="student-id">ID: ST003</div>
+                        </div>
+                        <div class="attendance-toggle present">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="student-item">
+                        <div class="student-info">
+                            <div class="student-name">Sneha Patel</div>
+                            <div class="student-id">ID: ST004</div>
+                        </div>
+                        <div class="attendance-toggle">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="student-item">
+                        <div class="student-info">
+                            <div class="student-name">Vikram Yadav</div>
+                            <div class="student-id">ID: ST005</div>
+                        </div>
+                        <div class="attendance-toggle">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn submit-btn">
+                        <i class="fas fa-check-circle"></i> Submit Attendance
+                    </button>
+                    <button class="action-btn report-btn">
+                        <i class="fas fa-chart-bar"></i> Generate Report
+                    </button>
+                    <button class="action-btn help-btn" id="help-btn">
+                        <i class="fas fa-question-circle"></i> Help Guide
+                    </button>
+                    <button class="action-btn sync-btn">
+                        <i class="fas fa-sync-alt"></i> Sync Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="help-section" id="help-section">
+                <h3>How to Use the Attendance System</h3>
+                
+                <div class="help-item">
+                    <i class="fas fa-qrcode"></i>
+                    <div>
+                        <strong>QR Code Attendance:</strong> Click the QR code button and scan each student's ID card
+                    </div>
+                </div>
+                
+                <div class="help-item">
+                    <i class="fas fa-camera"></i>
+                    <div>
+                        <strong>Facial Recognition:</strong> Click the camera button and take a photo of the class
+                    </div>
+                </div>
+                
+                <div class="help-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Submit Attendance:</strong> After marking, click submit to save the records
+                    </div>
+                </div>
+                
+                <div class="help-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <div>
+                        <strong>Generate Reports:</strong> Create daily, weekly, or monthly attendance reports
+                    </div>
+                </div>
+                
+                <div class="help-item">
+                    <i class="fas fa-sync-alt"></i>
+                    <div>
+                        <strong>Sync Data:</strong> When internet is available, sync data to the central server
+                    </div>
+                </div>
+                
+                <button class="action-btn" id="voice-guide-btn" style="background: var(--accent); margin-top: 15px;">
+                    <i class="fas fa-volume-up"></i> Play Voice Instructions
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Rural School Attendance System &copy; 2023 | Designed for offline use</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update date display
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.querySelector('.date-display').textContent = now.toLocaleDateString('en-US', options);
+            
+            // Class selection
+            const classButtons = document.querySelectorAll('.class-btn');
+            classButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    classButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    // In a real app, this would load the student list for the selected class
+                });
+            });
+            
+            // Attendance toggles
+            const attendanceToggles = document.querySelectorAll('.attendance-toggle');
+            attendanceToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.classList.toggle('present');
+                });
+            });
+            
+            // Help section toggle
+            const helpBtn = document.getElementById('help-btn');
+            const helpSection = document.getElementById('help-section');
+            helpBtn.addEventListener('click', function() {
+                if (helpSection.style.display === 'block') {
+                    helpSection.style.display = 'none';
+                } else {
+                    helpSection.style.display = 'block';
+                }
+            });
+            
+            // Voice guide
+            const voiceGuideBtn = document.getElementById('voice-guide-btn');
+            voiceGuideBtn.addEventListener('click', function() {
+                this.classList.toggle('voice-playing');
+                
+                if (this.classList.contains('voice-playing')) {
+                    this.innerHTML = '<i class="fas fa-stop"></i> Stop Voice Instructions';
+                    // In a real app, this would play audio instructions
+                    alert("Voice instructions would play here. In a real app, this would use the Web Speech API.");
+                } else {
+                    this.innerHTML = '<i class="fas fa-volume-up"></i> Play Voice Instructions';
+                    // In a real app, this would stop audio
+                }
+            });
+            
+            // QR Code button
+            document.getElementById('qr-btn').addEventListener('click', function() {
+                alert("QR code scanner would open here. In a real app, this would use the device camera to scan QR codes.");
+            });
+            
+            // Facial Recognition button
+            document.getElementById('face-btn').addEventListener('click', function() {
+                alert("Facial recognition would activate here. In a real app, this would use the device camera with facial recognition AI.");
+            });
+            
+            // Submit button
+            document.querySelector('.submit-btn').addEventListener('click', function() {
+                alert("Attendance data saved locally. Will sync when internet is available.");
+            });
+            
+            // Report button
+            document.querySelector('.report-btn').addEventListener('click', function() {
+                alert("Attendance report generated. In a real app, this would create a PDF or display a detailed report.");
+            });
+            
+            // Sync button
+            document.querySelector('.sync-btn').addEventListener('click', function() {
+                alert("Attempting to sync data with server... In a real app, this would upload locally stored data.");
+            });
+            
+            // Language buttons
+            const langButtons = document.querySelectorAll('.lang-btn');
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    langButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    // In a real app, this would change the interface language
+                });
+            });
+        });
+    </script>
+</body>
+</html>
